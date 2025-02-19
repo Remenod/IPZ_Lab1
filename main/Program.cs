@@ -4,7 +4,7 @@ using System.Numerics;
 
 namespace main
 {
-    class BinaryInteger 
+    class BinaryInteger
     {     
         char[] value { get; }
 
@@ -17,8 +17,30 @@ namespace main
         public BinaryInteger(BigInteger val) =>
             value = ToBinaryInt(val);
 
-        public static BinaryInteger operator +(BinaryInteger a, BinaryInteger b) =>
-            new(a.ToDecimalInt() + b.ToDecimalInt());
+        public static BinaryInteger operator +(BinaryInteger a, BinaryInteger b)
+        {
+            int maxLength = Math.Max(a.value.Length, b.value.Length);
+            char[] result = new char[maxLength + 1];
+            int carry = 0;
+
+            for (int i = 0; i < maxLength; i++)
+            {
+                int bitA = (i < a.value.Length) ? a.value[^(i + 1)] - '0' : 0;
+                int bitB = (i < b.value.Length) ? b.value[^(i + 1)] - '0' : 0;
+                int sum = bitA + bitB + carry;
+
+                result[^(i + 1)] = (char)((sum % 2) + '0');
+                carry = sum / 2;
+            }
+
+            if (carry > 0)
+            {
+                result[0] = '1';
+                return new BinaryInteger(result);
+            }
+
+            return new BinaryInteger(result[1..]);
+        }
 
         private char[] ToBinaryInt(BigInteger val)
         {
